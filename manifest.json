@@ -1,0 +1,13 @@
+{
+  "name": "GithubFileExplorer",
+  "description": "Navigate through Github repositories easily",
+  "version": "1.0",
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*/*"],
+      "js": ["font_awesome.js", "File_.js", "Dir.js", "index.js"],
+      "css": ["index.css"]
+    }
+  ]
+}
