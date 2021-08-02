@@ -1,102 +1,3 @@
-// Returns the name of the default branch of the given repo.
-// undefined if repo doesn't exist or some error while fetching.
-const getDefaultBranchName = async (owner, repo) => {
-  try {
-    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
-    const data = await res.json();
-
-    return data.default_branch;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-// Returns the tree_sha of a given branch.
-const getBranchTreeSha = async (owner, repo, branch) => {
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/branches/${branch}`
-    );
-    const data = await res.json();
-
-    return data.commit.sha;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-// Tree here refers to the list of all the files and subdirs
-// inside the directory corresponding to the given tree_sha.
-// Since recursive is set to true, it will also expand all the subdirs.
-const getTree = async (owner, repo, tree_sha) => {
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/git/trees/${tree_sha}?recursive=true`
-    );
-    const data = await res.json();
-
-    return data.tree;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const recGetDirectoryTree = (contents, curDir, owner, repo, branch) => {
-  while (contents.length > 0) {
-    const content = contents.pop();
-    if (!content.path.startsWith(curDir.path)) {
-      contents.push(content);
-      break;
-    }
-
-    const name = content.path.split("/").pop();
-    if (content.type === "tree") {
-      const subDir = new Dir(name, content.path, curDir);
-      curDir.addSubDir(subDir);
-      recGetDirectoryTree(contents, subDir, owner, repo, branch);
-    } else {
-      const link = `https://github.com/${owner}/${repo}/blob/${branch}/${content.path}`;
-      const file = new File_(name, content.path, link);
-      curDir.addFile(file);
-    }
-  }
-};
-
-// Returns a tree corresponding to the directory structure.
-const getDirectoryTree = async (owner, repo, branch) => {
-  try {
-    const tree_sha = await getBranchTreeSha(owner, repo, branch);
-
-    const contents = await getTree(owner, repo, tree_sha);
-
-    const root = new Dir("root", "", undefined);
-    // Note: passing the reversed array because pop() is faster than shift()
-    recGetDirectoryTree(contents.reverse(), root, owner, repo, branch);
-
-    return root;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-// Returns the branch name of the current url.
-// undefined if the url is not a repo or some error occurred.
-const getBranchName = async (url, owner, repo) => {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return undefined;
-
-    const data = url.split("/");
-    if (data.length === 5) return await getDefaultBranchName(owner, repo);
-    if (data.length === 6) return undefined;
-    if (data[5] !== "blob" && data[5] !== "tree") return undefined;
-
-    return data[6];
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 const newBody = `<nav id="navbar">
                   <header>
                     <h4 id="nav-title"></h4>
@@ -107,6 +8,7 @@ const newBody = `<nav id="navbar">
                   <ul id="file-explorer"></ul>
                 </nav>
                 <div id="others">
+                  <div id="resizer"></div>
                   ${document.body.innerHTML}
                 </div>`;
 
@@ -114,26 +16,52 @@ const main = async () => {
   const [owner, repo] = document.baseURI.split("/").slice(3, 5);
 
   const branch = await getBranchName(document.baseURI, owner, repo);
-  console.log(branch);
   if (!branch) return;
 
   document.body.innerHTML = newBody;
+  const others = document.getElementById("others");
+  const navbar = document.getElementById("navbar");
+  const explorer = document.getElementById("file-explorer");
+  const resizer = document.getElementById("resizer");
 
   const scrollBarWidth = window.innerWidth - document.body.offsetWidth;
-  const others = document.getElementById("others");
   others.style.width = `calc(80vw - ${scrollBarWidth}px)`;
+  others.style.minWidth = `calc(70vw - ${scrollBarWidth}px)`;
 
-  const title = document.getElementById("nav-title");
-  title.innerHTML = `${owner}\n${repo}`;
-
-  const navBranch = document.getElementById("nav-branch");
-  navBranch.append(` ${branch}`);
+  document.getElementById("nav-title").append(`${owner} / ${repo}`);
+  document.getElementById("nav-branch").append(` ${branch}`);
 
   const root = await getDirectoryTree(owner, repo, branch);
   if (!root) return;
 
-  const explorer = document.getElementById("file-explorer");
   explorer.appendChild(root.toggle());
+
+  let x;
+  resizer.addEventListener("mousedown", (event) => {
+    document.body.style.cursor = "ew-resize";
+    x = event.clientX;
+    document.addEventListener("mousemove", mousemoveHandler);
+    document.addEventListener("mouseup", mouseupHandler);
+  });
+
+  const mousemoveHandler = (event) => {
+    navbar.style.userSelect = "none";
+    others.style.userSelect = "none";
+
+    const dx = event.clientX - x;
+    navbar.style.width = `${navbar.offsetWidth + dx}px`;
+    others.style.width = `${others.offsetWidth - dx}px`;
+    x = event.clientX;
+  };
+
+  const mouseupHandler = (event) => {
+    document.body.style.removeProperty("cursor");
+    navbar.style.removeProperty("user-select");
+    others.style.removeProperty("user-select");
+
+    document.removeEventListener("mousemove", mousemoveHandler);
+    document.removeEventListener("mouseup", mouseupHandler);
+  };
 };
 
 main().catch(console.log);

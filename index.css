@@ -3,28 +3,27 @@
   border: 1px solid #30363d;
   position: fixed;
   width: 20vw;
+  max-width: 30vw;
   height: 100vh;
   float: left;
-  overflow-y: scroll;
-}
-
-#nav-title {
-  white-space: pre-line;
+  overflow: scroll;
 }
 
 #navbar > header {
   background-color: #161b22;
-  padding: 1rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 #nav-branch {
   display: block;
-  padding-top: 0.5rem;
+  padding-top: 0.2rem;
   font-size: 1rem;
 }
 
 #navbar::-webkit-scrollbar {
   width: 5px;
+  height: 0;
 }
 
 #navbar::-webkit-scrollbar-track {
@@ -39,8 +38,22 @@
   background: #ccc;
 }
 
+#file-explorer li {
+  white-space: nowrap;
+}
+
 #others {
   float: right;
+  min-height: 101vh;
+}
+
+#resizer {
+  width: 5px;
+  height: 100vh;
+  float: left;
+  cursor: ew-resize;
+  transform: translateX(-5px);
+  position: fixed;
 }
 
 .fa-folder,
