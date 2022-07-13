@@ -113,6 +113,7 @@ class Dir {
       // page are re-rendered as opposed to the whole page. It keeps track
       // of the state to provide functional arrow keys.
       link.setAttribute("data-pjax", "#repo-content-pjax-container");
+      link.setAttribute("data-turbo-frame", "repo-content-turbo-frame");
       link.setAttribute("href", file.link);
       link.append(file.name);
 
