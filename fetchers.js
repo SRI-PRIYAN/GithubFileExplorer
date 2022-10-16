@@ -44,7 +44,9 @@ const getTree = async (owner, repo, tree_sha) => {
 const recGetDirectoryTree = (contents, curDir, owner, repo, branch) => {
   while (contents.length > 0) {
     const content = contents.pop();
-    if (!content.path.startsWith(curDir.path)) {
+    // All contents belong to the root directory
+    // So for all other directories check if that content belongs to that directory
+    if (curDir.path != "/" && !content.path.startsWith(`${curDir.path}/`)) {
       contents.push(content);
       break;
     }
@@ -69,7 +71,7 @@ const getDirectoryTree = async (owner, repo, branch) => {
 
     const contents = await getTree(owner, repo, tree_sha);
 
-    const root = new Dir("root", "", undefined);
+    const root = new Dir("root", "/", undefined);
     // Note: passing the reversed array because pop() is faster than shift()
     recGetDirectoryTree(contents.reverse(), root, owner, repo, branch);
 
