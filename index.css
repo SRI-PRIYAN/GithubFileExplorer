@@ -1,18 +1,21 @@
 #navbar {
   background-color: #0d1117;
   border: 1px solid #30363d;
+  text-wrap: nowrap;
   position: fixed;
   width: 20vw;
   max-width: 30vw;
   height: 100vh;
   float: left;
   overflow: scroll;
+  z-index: 10;
 }
 
 #navbar > header {
   background-color: #161b22;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
+  min-width: fit-content;
 }
 
 #nav-branch {
@@ -54,6 +57,7 @@
   cursor: ew-resize;
   transform: translateX(-5px);
   position: fixed;
+  z-index: 10;
 }
 
 .fa-folder,
