@@ -36,6 +36,10 @@ class Dir {
     return this.#isOpen;
   }
 
+  set name(name) {
+    this.#name = name;
+  }
+
   toggle() {
     this.#isOpen = !this.#isOpen;
     return this.render();

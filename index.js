@@ -54,7 +54,7 @@ const main = async () => {
     x = event.clientX;
   };
 
-  const mouseupHandler = (event) => {
+  const mouseupHandler = () => {
     document.body.style.removeProperty("cursor");
     navbar.style.removeProperty("user-select");
     others.style.removeProperty("user-select");

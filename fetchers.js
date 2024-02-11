@@ -41,6 +41,20 @@ const getTree = async (owner, repo, tree_sha) => {
   }
 };
 
+const canBeCompressed = (dir) => {
+  return dir.subDirs.length === 1 && dir.files.length === 0;
+};
+
+const compressDir = (dir) => {
+  if (!canBeCompressed(dir) || !dir.parent) return;
+
+  const subDir = dir.subDirs[0];
+  subDir.name = `${dir.name}/${subDir.name}`;
+
+  const ind = dir.parent.subDirs.indexOf(dir);
+  dir.parent.subDirs[ind] = subDir;
+};
+
 const recGetDirectoryTree = (contents, curDir, owner, repo, branch) => {
   while (contents.length > 0) {
     const content = contents.pop();
@@ -62,6 +76,8 @@ const recGetDirectoryTree = (contents, curDir, owner, repo, branch) => {
       curDir.addFile(file);
     }
   }
+
+  compressDir(curDir);
 };
 
 // Returns a tree corresponding to the directory structure.
