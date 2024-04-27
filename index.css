@@ -3,7 +3,7 @@
   border: 1px solid #30363d;
   text-wrap: nowrap;
   position: fixed;
-  width: 20vw;
+  width: 21vw;
   max-width: 30vw;
   height: 100vh;
   float: left;
@@ -12,6 +12,9 @@
 }
 
 #navbar > header {
+  position: sticky;
+  top: 0;
+  box-shadow: 0 0 12px 7px rgb(10, 10, 10);
   background-color: #161b22;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
@@ -43,6 +46,7 @@
 
 #file-explorer li {
   white-space: nowrap;
+  padding-left: 5px;
 }
 
 #others {

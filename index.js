@@ -25,7 +25,7 @@ const main = async () => {
   const resizer = document.getElementById("resizer");
 
   const scrollBarWidth = window.innerWidth - document.body.offsetWidth;
-  others.style.width = `calc(80vw - ${scrollBarWidth}px)`;
+  others.style.width = `calc(79vw - ${scrollBarWidth}px)`;
   others.style.minWidth = `calc(70vw - ${scrollBarWidth}px)`;
 
   document.getElementById("nav-title").append(`${owner} / ${repo}`);
